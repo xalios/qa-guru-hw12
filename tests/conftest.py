@@ -1,9 +1,8 @@
 import pytest
 import os
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 from dotenv import load_dotenv
-from selene import Config, browser as br, Browser
+from selene import browser
 from qa_guru_hw10_tests.utils import attach
 
 RES_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'resources'))
@@ -15,30 +14,30 @@ def load_env():
 
 
 @pytest.fixture(scope='function')
-def setup_browser(request):
-    br.config.base_url = 'https://demoqa.com'
+def setup_browser():
+    browser.config.base_url = 'https://demoqa.com'
 
-    options = Options()
+    options = webdriver.ChromeOptions()
+    options.browser_version = "100.0"
     options.add_argument('--headless')
-    options.add_argument('--window-size=1920,1080')
-    selenoid_capabilities = {
-        "browserName": "chrome",
-        "browserVersion": "100.0",
-        "selenoid:options": {
-            "enableVNC": True,
-            "enableVideo": True
-        }
-    }
 
+    options.set_capability = (
+        "selenoid:options",
+        {
+            "enableVNC": True,
+            "enableVideo": True,
+            "enableLog": True,
+        },
+    )
+    browser.config.driver_options = options
     login = os.getenv('LOGIN')
     password = os.getenv('PASSWORD')
 
-    options.capabilities.update(selenoid_capabilities)
-    driver = webdriver.Remote(
-        command_executor=f"https://{login}:{password}@selenoid.autotests.cloud/wd/hub",
-        options=options
+    browser.config.driver_remote_url = (
+        f"https://{login}:{password}@selenoid.autotests.cloud/wd/hub"
     )
-    browser = Browser(Config(driver=driver))
+    browser.config.window_width = 1920
+    browser.config.window_height = 1080
 
     yield browser
 
