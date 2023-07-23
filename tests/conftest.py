@@ -3,12 +3,10 @@ import os
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from dotenv import load_dotenv
-from selene import browser
-
+from selene import Config, browser as br, Browser
 from qa_guru_hw10_tests.utils import attach
 
 RES_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'resources'))
-DEFAULT_BROWSER_VERSION = "100.0"
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -18,16 +16,14 @@ def load_env():
 
 @pytest.fixture(scope='function')
 def setup_browser(request):
-    browser.config.base_url = 'https://demoqa.com'
-    browser.config.window_height = 1080
-    browser.config.window_width = 1920
+    br.config.base_url = 'https://demoqa.com'
 
-    browser_version = request.config.getoption('--browser_version')
-    browser_version = browser_version if browser_version != "" else DEFAULT_BROWSER_VERSION
     options = Options()
+    options.add_argument('--headless')
+    options.add_argument('--window-size=1920,1080')
     selenoid_capabilities = {
         "browserName": "chrome",
-        "browserVersion": browser_version,
+        "browserVersion": "100.0",
         "selenoid:options": {
             "enableVNC": True,
             "enableVideo": True
@@ -42,9 +38,9 @@ def setup_browser(request):
         command_executor=f"https://{login}:{password}@selenoid.autotests.cloud/wd/hub",
         options=options
     )
-    browser.config.driver = driver
+    browser = Browser(Config(driver=driver))
 
-    yield
+    yield browser
 
     attach.add_html(browser)
     attach.add_screenshot(browser)
