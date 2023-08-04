@@ -20,14 +20,14 @@ def setup_browser():
     options = webdriver.ChromeOptions()
     options.browser_version = "100.0"
 
-    options.set_capability = (
-        "selenoid:options",
-        {
+    selenoid_capabilities = {
+        "selenoid:options": {
             "enableVNC": True,
-            "enableVideo": True,
-            "enableLog": True,
-        },
-    )
+            "enableVideo": True
+        }
+    }
+    options.capabilities.update(selenoid_capabilities)
+
     browser.config.driver_options = options
     login = os.getenv('LOGIN')
     password = os.getenv('PASSWORD')
