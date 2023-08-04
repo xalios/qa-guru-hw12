@@ -19,7 +19,6 @@ def setup_browser():
 
     options = webdriver.ChromeOptions()
     options.browser_version = "100.0"
-    options.add_argument('--headless')
 
     options.set_capability = (
         "selenoid:options",

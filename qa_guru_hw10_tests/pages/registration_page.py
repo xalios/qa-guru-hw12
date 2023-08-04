@@ -7,6 +7,8 @@ from os.path import join
 class RegistrationPage:
     def open(self):
         browser.open('/automation-practice-form')
+        browser.driver.execute_script("$('footer').remove()")
+        browser.driver.execute_script("$('#fixedban').remove()")
 
     def fill_name(self, firstname, lastname):
         browser.element('#firstName').should(be.blank).click().type(firstname)
